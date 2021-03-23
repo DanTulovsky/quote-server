@@ -31,7 +31,7 @@ func main() {
 	defer ls.Shutdown()
 
 	r := gin.Default()
-	r.Use(otelgin.Middleware("quote-server"))
+	r.Use(otelgin.Middleware(otelServiceName))
 
 	r.GET("/healthz", healthHandler)
 	r.GET("/servez", healthHandler)
