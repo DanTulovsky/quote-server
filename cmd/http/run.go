@@ -25,6 +25,7 @@ var (
 )
 
 func main() {
+	log.Printf("Starting version: %v", *version)
 
 	ls := enableOpenTelemetry()
 	tracer = otel.Tracer("global")
