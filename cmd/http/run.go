@@ -25,6 +25,7 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	log.Printf("Starting version: %v", *version)
 
 	ls := enableOpenTelemetry()
