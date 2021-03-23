@@ -33,11 +33,17 @@ func main() {
 	defer ls.Shutdown()
 
 	r := gin.Default()
-	r.Use(otelgin.Middleware(otelServiceName))
+	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
+		SkipPaths: []string{"/healthz", "/servez"},
+	}))
 
 	r.GET("/healthz", healthHandler)
 	r.GET("/servez", healthHandler)
-	r.GET("/", randomQuoteHandler)
+
+	trace := r.Group("/")
+	trace.Use(otelgin.Middleware(otelServiceName))
+	trace.GET("/", randomQuoteHandler)
+
 	r.Run()
 }
 
