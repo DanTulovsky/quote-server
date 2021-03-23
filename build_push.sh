@@ -1,6 +1,6 @@
 export IMAGE_NAME="server"
 export IMAGE_ID="ghcr.io/dantulovsky/quote-server/$IMAGE_NAME"
-export VERSION="0.0.2"
+export VERSION="0.0.3" # not used in automation
 
 echo "Building local/$IMAGE_NAME"
 docker build . --file Dockerfile --tag local/$IMAGE_NAME
