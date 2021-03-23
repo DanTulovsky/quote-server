@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/lightstep/otel-launcher-go/launcher"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -38,16 +40,26 @@ func main() {
 }
 
 func randomQuoteHandler(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	c.JSON(http.StatusOK, gin.H{
+		"quote": randomQuote(ctx),
+	})
+}
+
+func randomQuote(ctx context.Context) string {
 	// otelgin Middleware puts trace ID into context if available
-	_, span := tracer.Start(c.Request.Context(), "quote-handler")
+	_, span := tracer.Start(ctx, "getRandomQuote")
 	defer span.End()
 
-	log.Println(span.SpanContext().TraceID)
+	span.SetAttributes(attribute.String("quote_source", "static"))
+
+	span.AddEvent("get_quote", trace.WithAttributes(
+		attribute.Int("quote.id", 1),
+	))
 
 	quote := "some random quote"
-	c.JSON(http.StatusOK, gin.H{
-		"quote": quote,
-	})
+	return quote
 }
 
 func healthHandler(c *gin.Context) {
