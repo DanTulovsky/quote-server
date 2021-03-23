@@ -32,7 +32,8 @@ func main() {
 	tracer = otel.Tracer("global")
 	defer ls.Shutdown()
 
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
 		SkipPaths: []string{"/healthz", "/servez"},
 	}))
