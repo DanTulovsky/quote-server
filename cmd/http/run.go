@@ -18,7 +18,7 @@ const (
 
 var (
 	enableMetrics = flag.Bool("enable_metrics", true, "Set to enable metrics via lightstep (requires tracing is enabled).")
-	version       = flag.String("version", "", "version")
+	version       = flag.String("version", "", "version of the binary")
 	tracer        trace.Tracer
 )
 
