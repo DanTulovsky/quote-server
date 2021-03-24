@@ -6,8 +6,11 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/chenjiandongx/ginprom"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/lightstep/otel-launcher-go/launcher"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -34,18 +37,24 @@ func main() {
 
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.Use(ginprom.PromMiddleware(nil))
 	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
 		SkipPaths: []string{"/healthz", "/servez"},
 	}))
 
 	r.GET("/healthz", healthHandler)
 	r.GET("/servez", healthHandler)
+	// TODO: https://github.com/chenjiandongx/ginprom
+	r.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
 
 	trace := r.Group("/")
-	trace.Use(otelgin.Middleware(otelServiceName))
-	trace.GET("/", randomQuoteHandler)
+	{
+		trace.Use(otelgin.Middleware(otelServiceName))
+		trace.GET("/", randomQuoteHandler)
+	}
 
-	r.Run()
+	endless.ListenAndServe(":4242", r)
+	// r.Run()
 }
 
 func randomQuoteHandler(c *gin.Context) {
