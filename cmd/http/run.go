@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -67,6 +68,7 @@ func main() {
 func randomQuoteHandler(c *gin.Context) {
 	ctx := c.Request.Context()
 
+	// TODO: Write a grpc server that returns the source of the quote
 	quote := theysaidsoQuote(ctx)
 
 	header := "<html><body>"
@@ -171,8 +173,10 @@ func theysaidsoQuote(ctx context.Context) string {
 		// could be due to error from server
 		var errResult QuotaSearchError
 		if err := json.Unmarshal(body, &errResult); err != nil || errResult.Error == nil {
+			span.RecordError(err)
 			return fmt.Sprintf("failed to decode response from server: %v", err)
 		}
+		span.RecordError(fmt.Errorf("%v", errResult.Error.Message))
 		return errResult.Error.Message
 	}
 
@@ -180,8 +184,8 @@ func theysaidsoQuote(ctx context.Context) string {
 		return result.Contents.Quotes[0].Quote
 	}
 
+	span.RecordError(errors.New("did not receive any quotes from server"))
 	return fmt.Sprint("did not receive any quotes from server")
-
 }
 
 func staticQuote(ctx context.Context) string {
