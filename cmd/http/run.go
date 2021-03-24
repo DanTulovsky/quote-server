@@ -73,11 +73,11 @@ func randomQuoteHandler(c *gin.Context) {
 	footer := "</body></html>"
 	attribution := `
 	<span style="z-index:50;font-size:0.9em; font-weight: bold;">
-      <img src="https://theysaidso.com/branding/theysaidso.png" height="20" width="20" alt="theysaidso.com"/>
-      <a href="https://theysaidso.com" title="Powered by quotes from theysaidso.com" style="color: #ccc; margin-left: 4px; vertical-align: middle;">
+        <img src="https://theysaidso.com/branding/theysaidso.png" height="20" width="20" alt="theysaidso.com"/>
+        <a href="https://theysaidso.com" title="Powered by quotes from theysaidso.com" style="color: #ccc; margin-left: 4px; vertical-align: middle;">
         They Said So®
-      </a>
-</span>
+        </a>
+    </span>
 	`
 
 	var sb strings.Builder
@@ -132,7 +132,13 @@ type Quote struct {
 }
 
 func theysaidsoQuote(ctx context.Context) string {
-	_, span := tracer.Start(ctx, "theysaidsoQuote")
+	_, span := tracer.Start(ctx, "theysaidsoQuote",
+		trace.WithSpanKind(trace.SpanKindClient),
+		trace.WithAttributes(
+			semconv.HTTPMethodKey.String("GET"),
+			semconv.HTTPURLKey.String(theySaidSoURL),
+		),
+	)
 	defer span.End()
 
 	span.SetAttributes(attribute.String("quote_source", theySaidSoURL))
