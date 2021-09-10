@@ -1,0 +1,17 @@
+syntax = "proto3";
+package quote;
+
+option go_package = "github.com/DanTuovsky/quote-server/proto";
+
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/quote.proto
+
+
+service Quote {
+  rpc GetQuote(GetQuoteRequest) returns(GetQuoteResponse) {}
+}
+
+message GetQuoteRequest {}
+
+message GetQuoteResponse {
+  string quote_text = 10;
+}
