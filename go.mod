@@ -18,4 +18,6 @@ require (
 	go.opentelemetry.io/otel/trace v0.18.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
 	golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4 // indirect
+	google.golang.org/grpc v1.36.0
+	google.golang.org/protobuf v1.26.0
 )
