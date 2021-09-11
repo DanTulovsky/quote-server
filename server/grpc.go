@@ -24,7 +24,7 @@ func NewServer() *grpc.Server {
 	reflection.Register(s)
 
 	healthServer := health.NewServer()
-	healthServer.SetServingStatus("grpc.health.v1.helloservice", 1)
+	healthServer.SetServingStatus("grpc.health.v1.quoteservice", 1)
 	grpc_health_v1.RegisterHealthServer(s, healthServer)
 
 	return s
