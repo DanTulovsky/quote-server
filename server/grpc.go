@@ -3,6 +3,9 @@ package server
 import (
 	"context"
 
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+
 	"google.golang.org/grpc/reflection"
 
 	"google.golang.org/grpc"
@@ -19,6 +22,11 @@ func NewServer() *grpc.Server {
 	s := grpc.NewServer()
 	pb.RegisterQuoteServer(s, &server{})
 	reflection.Register(s)
+
+	healthServer := health.NewServer()
+	healthServer.SetServingStatus("grpc.health.v1.helloservice", 1)
+	grpc_health_v1.RegisterHealthServer(s, healthServer)
+
 	return s
 }
 
