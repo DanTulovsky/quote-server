@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
@@ -19,13 +21,18 @@ type server struct {
 }
 
 func NewServer() *grpc.Server {
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
+		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+	)
 	pb.RegisterQuoteServer(s, &server{})
 	reflection.Register(s)
 
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("grpc.health.v1.quoteservice", 1)
 	grpc_health_v1.RegisterHealthServer(s, healthServer)
+
+	grpc_prometheus.Register(s)
 
 	return s
 }
