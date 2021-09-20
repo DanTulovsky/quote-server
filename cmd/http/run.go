@@ -88,6 +88,12 @@ func randomQuoteHandler(c *gin.Context) {
 	sb.WriteString(attribution)
 	sb.WriteString(footer)
 
+	c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+	c.Header("Content-Security-Policy", "default-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+	c.Header("X-Frame-Options", "SAMEORIGIN")
+	c.Header("X-Content-Type-Options", "nosniff")
+	c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
+	//c.Header("Permissions-Policy", "")
 	c.String(http.StatusOK, sb.String())
 }
 
@@ -190,7 +196,7 @@ func theysaidsoQuote(ctx context.Context) string {
 
 func staticQuote(ctx context.Context) string {
 	// otelgin Middleware puts trace ID into context if available
-	_, span := tracer.Start(ctx, "getRandomQuote")
+	_, span := tracer.Start(ctx, "staticQuote")
 	defer span.End()
 
 	span.SetAttributes(attribute.String("quote_source", "static"))
